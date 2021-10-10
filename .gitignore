@@ -4,7 +4,12 @@
 venv/
 
 # Env Value File
+core/configs/local.py
 .env
+
+# Log Files
+logs/
+*.log
 
 
 # Editor Setting Files (Pycharm, VSCode ...)

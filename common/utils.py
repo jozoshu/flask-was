@@ -2,7 +2,7 @@ from datetime import date, datetime
 
 from pytz import timezone
 
-from core.config import DEFAULT_TIMEZONE
+from core.configs.base import DEFAULT_TIMEZONE
 
 tz = timezone(DEFAULT_TIMEZONE)
 
