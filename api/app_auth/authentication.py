@@ -17,3 +17,7 @@ def make_token(user):
     }
     encoded = jwt.encode(data, SECRET_KEY, algorithm='HS256')
     return encoded
+
+
+def autheticate(token):
+    jwt.decode(token, SECRET_KEY, algorithms='HS256')

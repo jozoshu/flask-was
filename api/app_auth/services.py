@@ -1,6 +1,6 @@
 from core.app import db
-from common.exceptions import APIException
-from common.exceptions.messages import Http4XX
+from common.exception import APIException
+from common.response.client_error import Http4XX
 from common.utils import hash_password, check_password
 from .authentication import make_token
 from .models import User
@@ -18,7 +18,7 @@ class SignUp:
             assert self.data.get('user_email')
             assert self.data.get('password')
             assert self.data.get('password2')
-        except AssertionError:
+        except AssertionError as e:
             raise APIException(Http4XX.INVALID_PARAMS)
 
         if self.data.get('password') != self.data.get('password2'):
@@ -28,7 +28,7 @@ class SignUp:
             phone_number=self.data.get('phone_number')
         ).all()
         if len(user)>0:
-            raise APIException(Http4XX.INVALID_PHONE_NUMBER)
+            raise APIException(Http4XX.INVALID_PHONE_NUMBER, phone_number=self.data.get('phone_number'))
 
 
     def save(self):
@@ -69,7 +69,7 @@ class Login:
         ).all()
 
         if len(users) == 0:
-            raise APIException(Http4XX.WRONG_EMAIL)
+            raise APIException(Http4XX.WRONG_EMAIL, user_email=self.data.get('user_email'))
 
         if not check_password(self.data.get('password'), users[0].password):
             raise APIException(Http4XX.WRONG_PASSWORD)

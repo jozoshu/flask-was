@@ -1,7 +1,7 @@
 from sqlalchemy import func
 
-from common.exceptions import APIException
-from common.exceptions.messages import Http4XX
+from common.exception import APIException
+from common.response.client_error import Http4XX
 from .models import LastCrawlDate, ProcessCollection
 
 
@@ -15,7 +15,7 @@ class GetLastCrawl:
     def validate(self):
         handler_type = self.params.get('type')
         if not isinstance(handler_type, str):
-            raise APIException(Http4XX.INVALID_PARAMS)
+            raise APIException(Http4XX.INVALID_PARAMS, **self.params)
 
         self.handler_type = handler_type.upper()
 
@@ -25,7 +25,7 @@ class GetLastCrawl:
         ).all()
 
         if len(result) == 0:
-            raise APIException(Http4XX.NOT_FOUND)
+            raise APIException(Http4XX.NOT_FOUND, type=self.handler_type)
 
         return [r.to_json() for r in result]
 
@@ -44,7 +44,7 @@ class GetCollecionStatus:
     def validate(self):
         handler_type = self.params.get('type')
         if not isinstance(handler_type, str):
-            raise APIException(Http4XX.INVALID_PARAMS)
+            raise APIException(Http4XX.INVALID_PARAMS, **self.params)
 
         self.handler_type = handler_type.upper()
 

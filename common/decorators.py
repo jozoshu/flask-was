@@ -4,13 +4,15 @@ import json
 from flask import request, Response
 import jwt
 
-from core.configs.base import SECRET_KEY
-from common.exceptions import APIException
-from common.response import exception, error, APIResponse
+from api.app_auth.authentication import autheticate
+from .exception import APIException
+from .response import APIResponse
+from .response.formats import exception, error
+from .response.client_error import Http4XX
 
 
-def send_format(func):
-    """Response 기본 형태"""
+def exception_format(func):
+    """예외 처리하여 Response"""
     @wraps(func)
     def wrapper(*args, **kwargs):
         try:
@@ -36,10 +38,10 @@ def login_required(func):
     def wrapper(*args, **kwargs):
         token = request.headers.get('Authorization')
         try:
-            jwt.decode(token, SECRET_KEY, algorithms='HS256')
+            autheticate(token)
         except jwt.DecodeError:
-            return APIResponse("유효하지 않은 토큰입니다.", 401, code="JWT001")
+            return APIResponse(Http4XX.INVALID_TOKEN)
         except jwt.ExpiredSignatureError:
-            return APIResponse("만료된 토큰입니다.", 401, code="JWT002")
+            return APIResponse(Http4XX.EXPIRED_TOKEN)
         return func(*args, **kwargs)
     return wrapper
