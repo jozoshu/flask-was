@@ -1,5 +1,6 @@
 from functools import wraps
 import json
+import logging
 
 from flask import request, Response
 import jwt
@@ -7,8 +8,10 @@ import jwt
 from api.app_auth.authentication import autheticate
 from .exception import APIException
 from .response import APIResponse
-from .response.formats import exception, error
 from .response.client_error import Http4XX
+from .response.formats import exception, error
+
+logger = logging.getLogger('flast.request')
 
 
 def exception_format(func):
@@ -18,12 +21,14 @@ def exception_format(func):
         try:
             return func(*args, **kwargs)
         except APIException as ae:
+            logger.error(f'{func.__qualname__} - {ae}')
             return Response(
                 response=json.dumps(exception(ae)),
                 status=ae.status,
                 mimetype='application/json'
             )
         except Exception as e:
+            logger.error(f'{func.__qualname__} - {e}')
             return Response(
                 response=json.dumps(error(e)),
                 status=500,

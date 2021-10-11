@@ -6,6 +6,7 @@ logger = logging.getLogger('flask.request')
 
 
 class LoggingMiddleware:
+    """End point 별로 request response 로깅"""
     def __init__(self, app):
         self.app = app
 
@@ -17,7 +18,10 @@ class LoggingMiddleware:
         logger.info(f'[{key}] - {method} {uri}')
 
         def _start_response(status, headers, *args):
-            logger.info(f'[{key}] - {method} {uri} - {status}')
+            if status[:2] == '20':
+                logger.info(f'[{key}] - {method} {uri} - {status}')
+            else:
+                logger.error(f'[{key}] - {method} {uri} - {status}')
             return start_response(status, headers, *args)
 
         return self.app(environ, _start_response)
