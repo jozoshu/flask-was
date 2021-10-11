@@ -1,4 +1,3 @@
-from functools import wraps
 import json
 
 from flask import Response
@@ -6,9 +5,9 @@ from flask import Response
 from common.exceptions import APIException
 
 
-def success(data: object) -> dict:
+def success(data: object, code='S000') -> dict:
     res = {
-        'code': 'S000',
+        'code': code,
         'data': data,
     }
     return res
@@ -30,27 +29,10 @@ def error(e: Exception) -> dict:
     return res
 
 
-def send_format(func):
-    """Response 기본 형태"""
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        try:
-            response = func(*args, **kwargs)
-            return Response(
-                response=json.dumps(success(response)),
-                status=200,
-                mimetype='application/json'
-            )
-        except APIException as ae:
-            return Response(
-                response=json.dumps(exception(ae)),
-                status=ae.status,
-                mimetype='application/json'
-            )
-        except Exception as e:
-            return Response(
-                response=json.dumps(error(e)),
-                status=500,
-                mimetype='application/json'
-            )
-    return wrapper
+class APIResponse(Response):
+    def __init__(self, response: Response, status=200, **kwargs):
+        super().__init__(
+            response=json.dumps(success(response, **kwargs)), 
+            status=status, 
+            mimetype='application/json'
+        )

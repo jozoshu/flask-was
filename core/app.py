@@ -5,6 +5,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
 from core.configs.base import get_env
+from core.middlewares.jwt_middleware import JWTMiddleware
 from core.middlewares.logging_middleware import LoggingMiddleware
 
 db = SQLAlchemy()
@@ -27,8 +28,10 @@ class App(Flask):
         self.env = env
 
     def set_blueprint(self):
-        from app_status.controllers import main
-        self.register_blueprint(main)
+        from api.app_auth.controllers import bp_auth
+        from api.app_status.controllers import bp_status
+        self.register_blueprint(bp_auth)
+        self.register_blueprint(bp_status)
 
     def db_init(self):
         db.init_app(self)
@@ -40,6 +43,7 @@ class App(Flask):
         _logger.disabled = True
 
     def add_middleware(self):
+        # self.wsgi_app = JWTMiddleware(self.wsgi_app)
         self.wsgi_app = LoggingMiddleware(self.wsgi_app)
 
 

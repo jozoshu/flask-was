@@ -58,7 +58,6 @@ class GetCollecionStatus:
             .group_by(ProcessCollection.status)
             .all()
         )
-
         return [{'status': r.status, 'count': r.count} for r in result]
 
     def run(self):

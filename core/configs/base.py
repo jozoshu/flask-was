@@ -1,3 +1,4 @@
+from datetime import timedelta
 import os
 
 from dotenv import load_dotenv
@@ -25,3 +26,5 @@ DEFAULT_TIMEZONE = 'Asia/Seoul'
 
 SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
 SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+JWT_EXPIRED_INTERVAL = timedelta(hours=24)
